@@ -1,0 +1,3 @@
+KEYMAP = dan
+OPT_DEFS += -DHHKB_JP
+include Makefile
