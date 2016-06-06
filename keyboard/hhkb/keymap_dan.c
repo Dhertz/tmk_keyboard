@@ -18,16 +18,16 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
      * |------------------------------------------------------`    |
      * |Contro|  A|  S|  D|  F|  G|  H|  J|  K|  L|  ;|  '|  \|    |
      * |-----------------------------------------------------------|
-     * |Shift  |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|   |Up |Shi|
+     * |Shift  |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|  `|Up |Shi|
      * |-----------------------------------------------------------|
-     * |Fn0||  #|Gui|Alt|F16|  Space  |Alt|GUI|Con|Fn0||Rig|Dow|Lef|
+     * |Fn1||  #|Gui|Alt|F16|   Fn0   |Alt|GUI|Con|Fn2||Rig|Dow|Lef|
      * `-----------------------------------------------------------'
      */
     KEYMAP_DAN(ESC,   1,   2,   3,   4,   5,   6,   7,   8,   9,   0,MINS, EQL, DEL,BSPC,  \
               TAB    ,   Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,LBRC,RBRC,         \
               LCTL    ,   A,   S,   D,   F,   G,   H,   J,   K,   L,SCLN,QUOT,NUHS, ENT ,  \
-              LSFT     ,   Z,   X,   C,   V,   B,   N,   M,COMM, DOT, SLSH,  RO,  UP,RSFT, \
-              FN0 , ZKHK,LGUI,LALT, F16,    SPC ,     RALT,RGUI,RCTL, FN0, LEFT,DOWN,RGHT),
+              LSFT     ,   Z,   X,   C,   V,   B,   N,   M,COMM, DOT, SLSH, GRV,  UP,RSFT, \
+              FN2 , FN1,LGUI,LALT, F16,    FN0      ,RALT,RGUI,RCTL, FN3, LEFT,DOWN,RGHT),
 
     /* Layer 1: HHKB mode (HHKB Fn)
      * ,-----------------------------------------------------------.
@@ -46,7 +46,7 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
               CAPS  ,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,  UP, TRNS,        \
               TRNS    ,VOLD,VOLU,MUTE,TRNS,TRNS,PAST,PSLS,TRNS,TRNS,LEFT,RGHT,TRNS,PENT , \
               TRNS     ,TRNS,TRNS,TRNS,TRNS,TRNS,PPLS,PMNS,TRNS,TRNS,DOWN,TRNS,PGUP,TRNS, \
-              TRNS, TRNS,TRNS,TRNS,TRNS,    TRNS,    TRNS,TRNS,TRNS,TRNS, HOME,PGDN, END),
+              TRNS, TRNS,TRNS,TRNS,TRNS,    TRNS     ,TRNS,TRNS,TRNS,TRNS, HOME,PGDN, END),
 };
 
 
@@ -59,5 +59,6 @@ const uint16_t fn_actions[] __attribute__ ((section (".keymap.fn_actions"))) = {
 #else
 const uint16_t fn_actions[] PROGMEM = {
 #endif
-    [0] = ACTION_LAYER_MOMENTARY(1),
+    [0] = ACTION_LAYER_TAP_KEY(1, KC_SPC),            // function layer with Space
+    [1] = ACTION_MODS_KEY(MOD_LALT, KC_3),
 };
