@@ -20,14 +20,14 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
      * |-----------------------------------------------------------|
      * |Shift  |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|  `|Up |Shi|
      * |-----------------------------------------------------------|
-     * |Fn2||  #|Gui|Alt|   |   Fn0   |Alt|GUI|Con|Fn3||Rig|Dow|Lef|
+     * |Fn2||  #|Gui|Alt|Fn6|   Fn0   |Alt|Gui|Con|Fn3||Rig|Dow|Lef|
      * `-----------------------------------------------------------'
      */
     KEYMAP_DAN(ESC,   1,   2,   3,   4,   5,   6,   7,   8,   9,   0,MINS, EQL, DEL,BSPC, \
               TAB    ,   Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,LBRC,RBRC,        \
               FN5     ,   A,   S,   D,   F,   G,   H,   J,   K,   L,SCLN,QUOT,NUHS, ENT , \
               LSFT     ,   Z,   X,   C,   V,   B,   N,   M,COMM, DOT,SLSH, GRV,  UP,RSFT, \
-              FN2 ,  FN1,LGUI,LALT,  NO,     FN0     ,RALT,RGUI,RCTL, FN3, LEFT,DOWN,RGHT),
+              FN2 ,  FN1,LGUI,LALT, FN6,     FN0     ,RALT,RGUI,RCTL, FN3, LEFT,DOWN,RGHT),
 
     /* Layer 1: HHKB mode (Space)
      * ,-----------------------------------------------------------.
@@ -68,7 +68,10 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
               TRNS, TRNS,TRNS,TRNS,TRNS,    BTN1     ,TRNS,TRNS,TRNS,TRNS, WH_L,WH_U,WH_R),
 };
 
-
+ 
+enum macro_id {
+    CMD_TAB,
+};
 
 /*
  * Fn action definition
@@ -84,4 +87,19 @@ const uint16_t fn_actions[] PROGMEM = {
     [3] = ACTION_LAYER_TAP_TOGGLE(2),                 // wasd mouse mode
     [4] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),          // tilde
     [5] = ACTION_MODS_TAP_KEY(MOD_LCTL, KC_F19),      // alfred
+    [6] = ACTION_MACRO(CMD_TAB),                      // cmd tab
 };
+
+/*
+ * Macro definition
+ */
+const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
+{
+    switch (id) {
+        case CMD_TAB:
+            return (record->event.pressed ?
+                    MACRO( D(LGUI), D(TAB), END ) :
+                    MACRO( U(LGUI), U(TAB), END ));
+    }
+    return MACRO_NONE;
+}
