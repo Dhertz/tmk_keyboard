@@ -68,37 +68,11 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
               TRNS, TRNS,TRNS,TRNS,TRNS,    BTN1     ,TRNS,TRNS,TRNS,TRNS, WH_L,WH_U,WH_R),
 };
 
-
 enum macro_id {
     CMD_TAB,
     CMD_GRAVE,
-};
-
-enum function_id {
     HASH_TILDE,
 };
-
-void action_function(keyrecord_t *record, uint8_t id, uint8_t opt) {
-    switch(id) {
-        case HASH_TILDE:
-            if (record->event.pressed) {
-                if (get_mods()&(MOD_BIT(KC_LSFT)|MOD_BIT(KC_RSFT))) {
-                    add_key(KC_GRV);
-                    send_keyboard_report();
-                } else {
-                    add_mods(MOD_BIT(KC_LALT));
-                    add_key(KC_3);
-                    send_keyboard_report();
-                }
-            } else {
-                del_key(KC_GRV);
-                del_key(KC_3);
-                del_mods(MOD_BIT(KC_LALT));
-                send_keyboard_report();
-            }
-            break;
-    }
-}
 
 /*
  * Fn action definition
@@ -109,7 +83,7 @@ const uint16_t fn_actions[] __attribute__ ((section (".keymap.fn_actions"))) = {
 const uint16_t fn_actions[] PROGMEM = {
 #endif
     [0] = ACTION_LAYER_TAP_KEY(1, KC_SPC),            // function layer with Space
-    [1] = ACTION_FUNCTION(HASH_TILDE),                // hash / tilde
+    [1] = ACTION_MACRO(HASH_TILDE),                   // hash / tilde
     [2] = ACTION_MODS_TAP_KEY(MOD_LCTL, KC_F18),      // notification centre
     [3] = ACTION_LAYER_TAP_KEY(2, MOD_RCTL),          // wasd mouse mode
     [4] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),          // tilde
@@ -126,12 +100,22 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
     switch (id) {
         case CMD_TAB:
             return (record->event.pressed ?
-                    MACRO( D(LGUI), D(TAB), END ) :
-                    MACRO( U(LGUI), U(TAB), END ));
+                    MACRO( D(LGUI), T(TAB), U(LGUI), END ) :
+                    MACRO_NONE);
 	case CMD_GRAVE:
             return (record->event.pressed ?
-                    MACRO( D(LGUI), D(GRV), END) :
-                    MACRO( U(LGUI), U(GRV), END));
+                    MACRO( D(LGUI), T(GRV), U(LGUI), END) :
+                    MACRO_NONE);
+        case HASH_TILDE:
+            if (get_mods()&(MOD_LSFT|MOD_RSFT)) {
+                return (record->event.pressed ?
+                       MACRO( D(GRV), END ) :
+                       MACRO( U(GRV), END ));
+            } else {
+                return (record->event.pressed ?
+                       MACRO( D(LALT), D(3), U(LALT), END ) :
+                       MACRO( U(LALT), U(3), END ));
+            }
     }
     return MACRO_NONE;
 }
