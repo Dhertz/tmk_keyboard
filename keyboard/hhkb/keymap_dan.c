@@ -80,7 +80,7 @@ enum macro_id {
 #ifdef KEYMAP_SECTION_ENABLE
 const uint16_t fn_actions[] __attribute__ ((section (".keymap.fn_actions"))) = {
 #else
-const uint16_t fn_actions[] PROGMEM = {
+const action_t fn_actions[] PROGMEM = {
 #endif
     [0] = ACTION_LAYER_TAP_KEY(1, KC_SPC),            // function layer with Space
     [1] = ACTION_MACRO(HASH_TILDE),                   // hash / tilde
