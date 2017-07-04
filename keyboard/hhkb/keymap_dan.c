@@ -20,14 +20,14 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
      * |-----------------------------------------------------------|
      * |Shift  |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|  `|Up |Shi|
      * |-----------------------------------------------------------|
-     * |Fn2||  #|Gui|Alt|Fn6|   Fn0   |Fn7|Alt|Gui|Fn3||Rig|Dow|Lef|
+     * |Fn2||  #|Gui|Alt|Fn6|   Fn0   |Fn7|Fn8|Gui|Fn3||Rig|Dow|Lef|
      * `-----------------------------------------------------------'
      */
     KEYMAP_DAN(ESC,   1,   2,   3,   4,   5,   6,   7,   8,   9,   0,MINS, EQL, DEL,BSPC, \
               TAB    ,   Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,LBRC,RBRC,        \
               FN5     ,   A,   S,   D,   F,   G,   H,   J,   K,   L,SCLN,QUOT,NUHS, ENT , \
               LSFT     ,   Z,   X,   C,   V,   B,   N,   M,COMM, DOT,SLSH, GRV,  UP,RSFT, \
-              FN2 ,  FN1,LGUI,LALT, FN6,     FN0     , FN7,RALT,RGUI, FN3, LEFT,DOWN,RGHT),
+              FN2 ,  FN1,LALT,FN6, FN6,     FN0     , FN7, FN8,RGUI, FN3, LEFT,DOWN,RGHT),
 
     /* Layer 1: HHKB mode (Space)
      * ,-----------------------------------------------------------.
@@ -35,17 +35,17 @@ const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
      * |-----------------------------------------------------------|
      * |Caps |   |   |   |   |   |   |   |Psc|Slk|Pus|Up |   |     |
      * |------------------------------------------------------`    |
-     * |      |VoD|VoU|Mut|   |   |   |Bsp|Del|   |Lef|Rig|   |    |
+     * |      |VoD|VoU|Mut|   |   |   |Bsp|Del|Fn10|Lef|Rig|   |   |
      * |-----------------------------------------------------------|
-     * |       |   |   |   |   |   |   |   |   |   |Dow|   |PgU|   |
+     * |       |   |   |Fn9|   |   |   |   |   |   |Dow|   |PgU|   |
      * |-----------------------------------------------------------|
      * |   ||  ~|   |   |   |         |   |   |   |   ||Hom|PgD|End|
      * `-----------------------------------------------------------'
      */
     KEYMAP_DAN(PWR,  F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12, INS, DEL, \
               CAPS  ,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PSCR,SLCK,PAUS,  UP, TRNS,        \
-              TRNS    ,VOLD,VOLU,MUTE,TRNS,TRNS,TRNS,BSPC, DEL,TRNS,LEFT,RGHT,TRNS,PENT , \
-              TRNS     ,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,DOWN,TRNS,PGUP,TRNS, \
+              TRNS    ,VOLD,VOLU,MUTE,TRNS,TRNS,TRNS,BSPC, DEL,FN10,LEFT,RGHT,TRNS,PENT , \
+              TRNS     ,TRNS,TRNS, FN9,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,DOWN,TRNS,PGUP,TRNS, \
               TRNS,  FN4,TRNS,TRNS,TRNS,    TRNS     ,TRNS,TRNS,TRNS,TRNS, HOME,PGDN, END),
     /* Layer 2: Mouse mode (HHKB Right Fn)
      * ,-----------------------------------------------------------.
@@ -72,6 +72,13 @@ enum macro_id {
     CMD_TAB,
     CMD_GRAVE,
     HASH_TILDE,
+    CTRL_A,
+    CMD_ALT_C,
+    CMD_SHIFT_L,
+};
+
+enum function_id {
+    CMD_TAB_CMD,
 };
 
 /*
@@ -88,8 +95,11 @@ const action_t fn_actions[] PROGMEM = {
     [3] = ACTION_LAYER_TAP_KEY(2, MOD_RCTL),          // wasd mouse mode
     [4] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),          // tilde
     [5] = ACTION_MODS_TAP_KEY(MOD_LCTL, KC_F19),      // alfred
-    [6] = ACTION_MACRO(CMD_TAB),                      // cmd tab
+    [6] = ACTION_FUNCTION_TAP(CMD_TAB_CMD),           // tap cmd tab or cmd
     [7] = ACTION_MACRO(CMD_GRAVE),                    // grave tab
+    [8] = ACTION_MACRO(CTRL_A),                       // ctrl a
+    [9]  = ACTION_MACRO(CMD_ALT_C),                    // cmd alt c
+    [10] = ACTION_MACRO(CMD_SHIFT_L),                  // cmd shift l
 };
 
 /*
@@ -116,6 +126,42 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
                        MACRO( D(LALT), D(3), U(LALT), END ) :
                        MACRO( U(LALT), U(3), END ));
             }
+       case CTRL_A:
+            return (record->event.pressed ?
+                       MACRO( D(LCTL), T(A), U(LCTL), END ) :
+                       MACRO_NONE);
+       case CMD_ALT_C:
+            return (record->event.pressed ?
+                    MACRO( D(LGUI), D(LALT), T(C), U(LGUI),  U(LALT), END) :
+                    MACRO_NONE);
+       case CMD_SHIFT_L:
+            return (record->event.pressed ?
+                    MACRO( D(LGUI), D(LSFT), T(L), U(LGUI),  U(LSFT), END) :
+                    MACRO_NONE);
     }
     return MACRO_NONE;
+}
+
+void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
+{
+    switch (id) {
+        case CMD_TAB_CMD:
+            if (record->event.pressed) {
+                if (record->tap.count > 0 && !record->tap.interrupted) {
+                    if (record->tap.interrupted) {
+                        register_mods(MOD_BIT(KC_LGUI));
+                    }
+                } else {
+                    register_mods(MOD_BIT(KC_LGUI));
+                }
+            } else {
+                if (record->tap.count > 0 && !(record->tap.interrupted)) {
+                    action_macro_play(MACRO( D(LGUI), T(TAB), U(LGUI), END ));
+                    record->tap.count = 0;  // ad hoc: cancel tap
+                } else {
+                    unregister_mods(MOD_BIT(KC_LGUI));
+                }
+            }
+            break;
+    }
 }
